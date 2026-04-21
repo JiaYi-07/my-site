@@ -1,0 +1,1537 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python 基础 - 个人主页</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#00d4ff',
+                        accent: '#7c3aed',
+                        success: '#10b981',
+                        dark: {
+                            900: '#0a0e17',
+                            800: '#111827',
+                            700: '#1a1f2e',
+                            600: '#242938',
+                        },
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace'],
+                    },
+                },
+            }
+        }
+    </script>
+    <style>
+        /* ========== 基础样式 ========== */
+        * { scroll-behavior: smooth; }
+        body { background: #0a0e17; }
+
+        /* ========== 导航栏样式 ========== */
+        .nav-link {
+            position: relative;
+            padding-bottom: 2px;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            border-radius: 1px;
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* ========== 移动端菜单 ========== */
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .mobile-menu.open {
+            max-height: 300px;
+        }
+
+        /* ========== 英雄区域动画 ========== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        .hero-title { animation: fadeInUp 0.8s ease-out 0.3s both; }
+        .hero-desc { animation: fadeInUp 0.8s ease-out 0.5s both; }
+        .hero-btn  { animation: fadeInUp 0.8s ease-out 0.7s both; }
+        .hero-bg {
+            background: linear-gradient(-45deg, #0a0e17, #111827, #0d1525, #0a0e17);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+        }
+        .hero-grid {
+            background-image:
+                linear-gradient(rgba(0, 212, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 212, 255, 0.05) 1px, transparent 1px);
+            background-size: 60px 60px;
+        }
+        .hero-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+            animation: pulse-glow 6s ease-in-out infinite;
+        }
+
+        /* ========== 滚动入场动画 ========== */
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease-out, transform 0.7s ease-out;
+        }
+        .scroll-reveal.revealed {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========== 进度条 ========== */
+        .progress-bar {
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.06);
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            width: 0;
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 3px;
+            box-shadow: 0 0 12px currentColor;
+            opacity: 0.6;
+        }
+
+        /* ========== 区域标题 ========== */
+        .section-title {
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed);
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+
+        /* ========== Python 知识卡片 ========== */
+        .python-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .python-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #00d4ff, #7c3aed, #10b981);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        .python-card:hover::before { transform: scaleX(1); }
+        .python-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.08), 0 20px 40px rgba(0,0,0,0.3);
+        }
+
+        /* ========== Python 代码块 ========== */
+        .code-block {
+            background: #111827;
+            border-radius: 12px;
+            overflow: hidden;
+            font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .code-block:hover {
+            border-color: rgba(0, 212, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.06);
+        }
+        .code-header {
+            background: rgba(255,255,255,0.03);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .code-dots { display: flex; gap: 6px; }
+        .code-dots span { width: 10px; height: 10px; border-radius: 50%; }
+        .code-body {
+            padding: 16px 20px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            white-space: pre;
+        }
+        .code-body .kw  { color: #c084fc; }
+        .code-body .fn  { color: #60a5fa; }
+        .code-body .str { color: #4ade80; }
+        .code-body .num { color: #fb923c; }
+        .code-body .cmt { color: #64748b; font-style: italic; }
+        .code-body .op  { color: #94a3b8; }
+        .code-body .var { color: #e2e8f0; }
+        .code-body .bi  { color: #fbbf24; }
+        .copy-btn {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #64748b;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .copy-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+        }
+
+        /* ========== 回到顶部 ========== */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px; right: 30px;
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            opacity: 0; visibility: hidden;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            z-index: 50; border: none;
+        }
+        .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+        .back-to-top:hover { transform: translateY(-3px); box-shadow: 0 6px 25px rgba(0, 212, 255, 0.4); }
+
+        /* ========== 页脚 ========== */
+        .footer-gradient { background: linear-gradient(135deg, #111827, #0a0e17); border-top: 1px solid rgba(255,255,255,0.05); }
+
+        /* ========== 滚动条 ========== */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0a0e17; }
+        ::-webkit-scrollbar-thumb { background: #242938; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00d4ff; }
+
+        /* ========== 在线练习 ========== */
+        .editor-textarea {
+            background: #0d1117;
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 14px;
+            line-height: 1.7;
+            resize: none;
+            border: none;
+            outline: none;
+            width: 100%;
+            min-height: 200px;
+            padding: 16px 20px;
+            tab-size: 4;
+        }
+        .editor-textarea::placeholder { color: #4a5568; }
+        .output-panel {
+            background: #0d1117;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            line-height: 1.7;
+            color: #e2e8f0;
+            min-height: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 16px 20px;
+        }
+        .output-panel .out-success { color: #10b981; }
+        .output-panel .out-error { color: #f87171; }
+        .output-panel .out-info { color: #60a5fa; }
+        .output-panel .out-warn { color: #fbbf24; }
+        .exercise-card {
+            background: #111827;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: border-color 0.3s ease;
+        }
+        .exercise-card:hover {
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+        .exercise-card.active {
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.08);
+        }
+        .exercise-tab {
+            padding: 10px 16px;
+            font-size: 13px;
+            color: #64748b;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .exercise-tab:hover { color: #94a3b8; }
+        .exercise-tab.active {
+            color: #00d4ff;
+            border-bottom-color: #00d4ff;
+        }
+        .exercise-tab.completed {
+            color: #10b981;
+        }
+        .run-btn {
+            background: linear-gradient(135deg, #00d4ff, #7c3aed);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .run-btn:hover {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+            transform: translateY(-1px);
+        }
+        .reset-btn {
+            background: rgba(255,255,255,0.06);
+            color: #94a3b8;
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .reset-btn:hover {
+            background: rgba(255,255,255,0.1);
+            color: #e2e8f0;
+        }
+        .result-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .result-pass {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        .result-fail {
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.3);
+            color: #f87171;
+        }
+        .difficulty-easy { color: #10b981; }
+        .difficulty-medium { color: #fbbf24; }
+        .difficulty-hard { color: #f87171; }
+        .tab-scroll { overflow-x: auto; scrollbar-width: none; }
+        .tab-scroll::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="font-sans antialiased text-gray-200">
+    <div class="min-h-screen flex flex-col">
+
+        <!-- ========== 导航栏 ========== -->
+        <nav id="navbar" class="bg-black/40 backdrop-blur-xl py-4 fixed w-full top-0 z-50 transition-all duration-300 border-b border-white/5">
+            <div class="container mx-auto px-4 flex justify-between items-center">
+                <a href="index.html" class="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                    <i class="fa fa-diamond mr-1 text-primary"></i> 个人主页
+                </a>
+                <div class="hidden md:flex space-x-8">
+                    <a href="index.html" class="nav-link text-gray-400 hover:text-primary transition-colors">返回主页</a>
+                    <a href="#knowledge" class="nav-link text-gray-400 hover:text-primary transition-colors">知识模块</a>
+                    <a href="#examples" class="nav-link text-gray-400 hover:text-primary transition-colors">代码示例</a>
+                    <a href="#practice" class="nav-link text-gray-400 hover:text-primary transition-colors">在线练习</a>
+                </div>
+                <div class="md:hidden">
+                    <button id="menuBtn" class="text-gray-400 text-xl p-2 rounded-lg hover:bg-white/5 transition-colors">
+                        <i class="fa fa-bars" id="menuIcon"></i>
+                    </button>
+                </div>
+            </div>
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-dark-900/95 backdrop-blur-xl border-t border-white/5">
+                <div class="container mx-auto px-4 py-4 space-y-3">
+                    <a href="index.html" class="block text-gray-400 hover:text-primary py-2 transition-colors mobile-link">
+                        <i class="fa fa-home mr-2 text-primary/60"></i>返回主页
+                    </a>
+                    <a href="#knowledge" class="block text-gray-400 hover:text-primary py-2 transition-colors mobile-link">
+                        <i class="fa fa-book mr-2 text-primary/60"></i>知识模块
+                    </a>
+                    <a href="#examples" class="block text-gray-400 hover:text-primary py-2 transition-colors mobile-link">
+                        <i class="fa fa-terminal mr-2 text-primary/60"></i>代码示例
+                    </a>
+                    <a href="#practice" class="block text-gray-400 hover:text-primary py-2 transition-colors mobile-link">
+                        <i class="fa fa-flask mr-2 text-primary/60"></i>在线练习
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- ========== 页面头部 ========== -->
+        <header class="hero-bg py-24 md:py-32 relative overflow-hidden pt-28">
+            <!-- 网格装饰 -->
+            <div class="hero-grid absolute inset-0 z-0"></div>
+            <!-- 发光装饰 -->
+            <div class="hero-glow w-96 h-96 bg-primary/20 -top-48 -right-48" style="position:absolute;"></div>
+            <div class="hero-glow w-80 h-80 bg-accent/15 -bottom-40 -left-40" style="position:absolute; animation-delay: 3s;"></div>
+            <div class="hero-glow w-48 h-48 bg-success/10 top-1/3 right-1/4" style="position:absolute; animation-delay: 1.5s;"></div>
+
+            <div class="container mx-auto px-4 text-center relative z-10">
+                <div class="inline-block p-2 bg-dark-700 rounded-full border border-white/10 mb-8 relative" style="animation: float 3s ease-in-out infinite 1s;">
+                    <div class="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-5xl shadow-lg shadow-primary/20">
+                        <i class="fa fa-code"></i>
+                    </div>
+                </div>
+                <h1 class="hero-title text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-tight">
+                    Python <span class="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">基础</span>
+                </h1>
+                <p class="hero-desc text-lg md:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
+                    掌握 Python 核心基础知识，为数据分析与自动化打下坚实基础
+                </p>
+                <div class="hero-btn mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#knowledge" class="inline-flex items-center justify-center bg-gradient-to-r from-primary to-accent text-white px-8 py-3.5 rounded-full font-medium hover:shadow-lg hover:shadow-primary/25 transition-all duration-300 hover:-translate-y-0.5">
+                        <i class="fa fa-book mr-2"></i>知识模块
+                    </a>
+                    <a href="index.html" class="inline-flex items-center justify-center bg-dark-700 text-gray-300 px-8 py-3.5 rounded-full font-medium border border-white/10 hover:border-primary/30 hover:text-primary transition-all duration-300 hover:-translate-y-0.5">
+                        <i class="fa fa-arrow-left mr-2"></i>返回主页
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- ========== 知识模块 ========== -->
+        <section id="knowledge" class="py-20 bg-dark-900">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16 scroll-reveal text-white">知识模块</h2>
+                <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                    <!-- 变量与数据类型 -->
+                    <div class="python-card bg-dark-800 rounded-2xl p-6 border border-gray-700/50 scroll-reveal" style="transition-delay: 0.1s;">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary border border-primary/20">
+                                <i class="fa fa-cube text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold ml-3 text-white">变量与数据类型</h3>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-2">
+                            <li class="flex items-start"><span class="text-primary mr-2 mt-0.5">&#9679;</span>整型 int、浮点型 float</li>
+                            <li class="flex items-start"><span class="text-primary mr-2 mt-0.5">&#9679;</span>字符串 str 的常用操作</li>
+                            <li class="flex items-start"><span class="text-primary mr-2 mt-0.5">&#9679;</span>布尔型 bool 与类型转换</li>
+                            <li class="flex items-start"><span class="text-primary mr-2 mt-0.5">&#9679;</span>列表 list、元组 tuple</li>
+                            <li class="flex items-start"><span class="text-primary mr-2 mt-0.5">&#9679;</span>字典 dict、集合 set</li>
+                        </ul>
+                        <div class="progress-bar mt-4">
+                            <div class="progress-fill bg-gradient-to-r from-primary to-cyan-400" style="color: #00d4ff;" data-width="88%"></div>
+                        </div>
+                        <div class="text-right text-xs text-gray-500 mt-1">88%</div>
+                    </div>
+
+                    <!-- 控制流 -->
+                    <div class="python-card bg-dark-800 rounded-2xl p-6 border border-gray-700/50 scroll-reveal" style="transition-delay: 0.2s;">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-accent/10 rounded-xl flex items-center justify-center text-accent border border-accent/20">
+                                <i class="fa fa-code-branch text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold ml-3 text-white">控制流</h3>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-2">
+                            <li class="flex items-start"><span class="text-accent mr-2 mt-0.5">&#9679;</span>if / elif / else 条件判断</li>
+                            <li class="flex items-start"><span class="text-accent mr-2 mt-0.5">&#9679;</span>for 循环与 range()</li>
+                            <li class="flex items-start"><span class="text-accent mr-2 mt-0.5">&#9679;</span>while 循环与 break/continue</li>
+                            <li class="flex items-start"><span class="text-accent mr-2 mt-0.5">&#9679;</span>列表推导式</li>
+                            <li class="flex items-start"><span class="text-accent mr-2 mt-0.5">&#9679;</span>三元表达式</li>
+                        </ul>
+                        <div class="progress-bar mt-4">
+                            <div class="progress-fill bg-gradient-to-r from-accent to-purple-400" style="color: #7c3aed;" data-width="82%"></div>
+                        </div>
+                        <div class="text-right text-xs text-gray-500 mt-1">82%</div>
+                    </div>
+
+                    <!-- 函数与模块 -->
+                    <div class="python-card bg-dark-800 rounded-2xl p-6 border border-gray-700/50 scroll-reveal" style="transition-delay: 0.3s;">
+                        <div class="flex items-center mb-4">
+                            <div class="w-12 h-12 bg-success/10 rounded-xl flex items-center justify-center text-success border border-success/20">
+                                <i class="fa fa-puzzle-piece text-xl"></i>
+                            </div>
+                            <h3 class="text-lg font-semibold ml-3 text-white">函数与模块</h3>
+                        </div>
+                        <ul class="text-sm text-gray-400 space-y-2">
+                            <li class="flex items-start"><span class="text-success mr-2 mt-0.5">&#9679;</span>def 定义函数与参数</li>
+                            <li class="flex items-start"><span class="text-success mr-2 mt-0.5">&#9679;</span>默认参数与可变参数</li>
+                            <li class="flex items-start"><span class="text-success mr-2 mt-0.5">&#9679;</span>lambda 匿名函数</li>
+                            <li class="flex items-start"><span class="text-success mr-2 mt-0.5">&#9679;</span>import 导入模块</li>
+                            <li class="flex items-start"><span class="text-success mr-2 mt-0.5">&#9679;</span>常用内置函数</li>
+                        </ul>
+                        <div class="progress-bar mt-4">
+                            <div class="progress-fill bg-gradient-to-r from-success to-emerald-400" style="color: #10b981;" data-width="78%"></div>
+                        </div>
+                        <div class="text-right text-xs text-gray-500 mt-1">78%</div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 代码示例 ========== -->
+        <section id="examples" class="py-20 bg-dark-800">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-16 scroll-reveal text-white">代码示例</h2>
+                <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- 示例1：变量与数据类型 -->
+                    <div class="scroll-reveal" style="transition-delay: 0.1s;">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-dots">
+                                    <span class="bg-red-500/80"></span>
+                                    <span class="bg-yellow-500/80"></span>
+                                    <span class="bg-green-500/80"></span>
+                                </div>
+                                <span class="text-gray-500 text-xs font-mono">variable.py</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-body"><span class="cmt"># 变量与数据类型</span>
+<span class="var">name</span> <span class="op">=</span> <span class="str">"同学"</span>
+<span class="var">age</span> <span class="op">=</span> <span class="num">20</span>
+<span class="var">height</span> <span class="op">=</span> <span class="num">1.75</span>
+<span class="var">is_student</span> <span class="op">=</span> <span class="bi">True</span>
+
+<span class="cmt"># 列表操作</span>
+<span class="var">scores</span> <span class="op">=</span> [<span class="num">90</span>, <span class="num">85</span>, <span class="num">92</span>, <span class="num">78</span>]
+<span class="var">scores</span>.<span class="fn">append</span>(<span class="num">88</span>)
+<span class="fn">print</span>(<span class="fn">len</span>(<span class="var">scores</span>))  <span class="cmt"># 5</span>
+
+<span class="cmt"># 字典操作</span>
+<span class="var">info</span> <span class="op">=</span> {<span class="str">"name"</span>: <span class="var">name</span>, <span class="str">"age"</span>: <span class="var">age</span>}
+<span class="fn">print</span>(<span class="var">info</span>[<span class="str">"name"</span>])  <span class="cmt"># 同学</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 示例2：控制流 -->
+                    <div class="scroll-reveal" style="transition-delay: 0.2s;">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-dots">
+                                    <span class="bg-red-500/80"></span>
+                                    <span class="bg-yellow-500/80"></span>
+                                    <span class="bg-green-500/80"></span>
+                                </div>
+                                <span class="text-gray-500 text-xs font-mono">control_flow.py</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-body"><span class="cmt"># 条件判断</span>
+<span class="var">score</span> <span class="op">=</span> <span class="num">85</span>
+<span class="kw">if</span> <span class="var">score</span> <span class="op">>=</span> <span class="num">90</span>:
+    <span class="fn">print</span>(<span class="str">"优秀"</span>)
+<span class="kw">elif</span> <span class="var">score</span> <span class="op">>=</span> <span class="num">80</span>:
+    <span class="fn">print</span>(<span class="str">"良好"</span>)
+<span class="kw">else</span>:
+    <span class="fn">print</span>(<span class="str">"继续努力"</span>)
+
+<span class="cmt"># 列表推导式</span>
+<span class="var">nums</span> <span class="op">=</span> [<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>, <span class="num">5</span>]
+<span class="var">squares</span> <span class="op">=</span> [x<span class="op">**</span><span class="num">2</span> <span class="kw">for</span> x <span class="kw">in</span> <span class="var">nums</span>]
+<span class="cmt"># [1, 4, 9, 16, 25]</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 示例3：函数 -->
+                    <div class="scroll-reveal" style="transition-delay: 0.3s;">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-dots">
+                                    <span class="bg-red-500/80"></span>
+                                    <span class="bg-yellow-500/80"></span>
+                                    <span class="bg-green-500/80"></span>
+                                </div>
+                                <span class="text-gray-500 text-xs font-mono">function.py</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-body"><span class="cmt"># 定义函数</span>
+<span class="kw">def</span> <span class="fn">greet</span>(<span class="var">name</span>, <span class="var">greeting</span><span class="op">=</span><span class="str">"你好"</span>):
+    <span class="kw">return</span> <span class="str">f"</span><span class="var">{greeting}</span><span class="str">, </span><span class="var">{name}</span><span class="str">!"</span>
+
+<span class="fn">print</span>(<span class="fn">greet</span>(<span class="str">"同学"</span>))
+<span class="cmt"># 输出: 你好, 同学!</span>
+
+<span class="cmt"># lambda 表达式</span>
+<span class="var">add</span> <span class="op">=</span> <span class="kw">lambda</span> x, y: x <span class="op">+</span> y
+<span class="fn">print</span>(<span class="var">add</span>(<span class="num">3</span>, <span class="num">5</span>))  <span class="cmt"># 8</span></div>
+                        </div>
+                    </div>
+
+                    <!-- 示例4：文件与异常 -->
+                    <div class="scroll-reveal" style="transition-delay: 0.4s;">
+                        <div class="code-block">
+                            <div class="code-header">
+                                <div class="code-dots">
+                                    <span class="bg-red-500/80"></span>
+                                    <span class="bg-yellow-500/80"></span>
+                                    <span class="bg-green-500/80"></span>
+                                </div>
+                                <span class="text-gray-500 text-xs font-mono">file_io.py</span>
+                                <button class="copy-btn" onclick="copyCode(this)">复制</button>
+                            </div>
+                            <div class="code-body"><span class="cmt"># 文件读写</span>
+<span class="kw">with</span> <span class="bi">open</span>(<span class="str">"data.txt"</span>, <span class="str">"r"</span>) <span class="kw">as</span> <span class="var">f</span>:
+    <span class="var">content</span> <span class="op">=</span> <span class="var">f</span>.<span class="fn">read</span>()
+
+<span class="cmt"># 异常处理</span>
+<span class="kw">try</span>:
+    <span class="var">result</span> <span class="op">=</span> <span class="num">10</span> <span class="op">/</span> <span class="num">0</span>
+<span class="kw">except</span> <span class="bi">ZeroDivisionError</span>:
+    <span class="fn">print</span>(<span class="str">"除数不能为零"</span>)
+<span class="kw">finally</span>:
+    <span class="fn">print</span>(<span class="str">"执行完毕"</span>)</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 在线练习 ========== -->
+        <section id="practice" class="py-20 bg-dark-900">
+            <div class="container mx-auto px-4">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-center mb-4 scroll-reveal text-white">在线练习</h2>
+                <p class="text-center text-gray-500 mb-12 scroll-reveal">编写代码，运行查看结果，完成题目挑战</p>
+
+                <div class="max-w-5xl mx-auto">
+                    <div class="exercise-card scroll-reveal">
+                        <!-- 题目标签栏 -->
+                        <div class="border-b border-white/5 bg-dark-800/50">
+                            <div class="tab-scroll flex">
+                                <div class="exercise-tab active" data-exercise="0" onclick="switchExercise(0)">
+                                    <i class="fa fa-play-circle mr-1"></i>自由练习
+                                </div>
+                                <div class="exercise-tab" data-exercise="1" onclick="switchExercise(1)">
+                                    <span class="difficulty-easy mr-1">●</span>变量与打印
+                                </div>
+                                <div class="exercise-tab" data-exercise="2" onclick="switchExercise(2)">
+                                    <span class="difficulty-easy mr-1">●</span>列表操作
+                                </div>
+                                <div class="exercise-tab" data-exercise="3" onclick="switchExercise(3)">
+                                    <span class="difficulty-medium mr-1">●</span>条件判断
+                                </div>
+                                <div class="exercise-tab" data-exercise="4" onclick="switchExercise(4)">
+                                    <span class="difficulty-medium mr-1">●</span>函数定义
+                                </div>
+                                <div class="exercise-tab" data-exercise="5" onclick="switchExercise(5)">
+                                    <span class="difficulty-hard mr-1">●</span>字典与循环
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题目描述 -->
+                        <div id="exerciseDesc" class="px-6 py-4 border-b border-white/5 bg-dark-800/30">
+                            <div class="flex items-start justify-between">
+                                <div>
+                                    <h3 id="exerciseTitle" class="text-white font-semibold mb-1">自由练习</h3>
+                                    <p id="exerciseDetail" class="text-gray-400 text-sm leading-relaxed">在这里自由编写 Python 代码，点击运行查看输出结果。</p>
+                                </div>
+                                <div id="exerciseResult" class="flex-shrink-0 ml-4 hidden">
+                                </div>
+                            </div>
+                            <div id="exerciseHint" class="mt-3 p-3 rounded-lg text-sm hidden" style="background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.1);">
+                                <span class="text-primary font-medium"><i class="fa fa-lightbulb-o mr-1"></i>提示：</span>
+                                <span id="hintText" class="text-gray-400"></span>
+                            </div>
+                        </div>
+
+                        <!-- 代码编辑器 -->
+                        <div class="relative">
+                            <div class="flex items-center justify-between px-4 py-2 bg-dark-800/50 border-b border-white/5">
+                                <div class="flex items-center gap-2">
+                                    <div class="code-dots flex gap-1.5">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-red-500/70"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-yellow-500/70"></span>
+                                        <span class="w-2.5 h-2.5 rounded-full bg-green-500/70"></span>
+                                    </div>
+                                    <span class="text-gray-500 text-xs font-mono ml-2">editor.py</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button class="reset-btn" onclick="resetCode()"><i class="fa fa-undo mr-1"></i>重置</button>
+                                    <button class="run-btn" onclick="runCode()"><i class="fa fa-play"></i>运行</button>
+                                </div>
+                            </div>
+                            <textarea id="codeEditor" class="editor-textarea" placeholder="# 在这里编写 Python 代码..." spellcheck="false"># 欢迎来到 Python 在线练习！
+# 在这里自由编写代码，点击"运行"查看结果
+
+name = "王佳仪"
+age = 20
+print(f"你好，我是{name}，今年{age}岁")
+
+# 试试列表操作
+scores = [90, 85, 92, 78, 88]
+print(f"成绩列表: {scores}")
+print(f"平均分: {sum(scores)/len(scores):.1f}")</textarea>
+                        </div>
+
+                        <!-- 输出面板 -->
+                        <div class="border-t border-white/5">
+                            <div class="flex items-center px-4 py-2 bg-dark-800/50">
+                                <span class="text-gray-500 text-xs font-mono"><i class="fa fa-terminal mr-1"></i>输出结果</span>
+                                <button class="ml-auto text-gray-600 text-xs hover:text-gray-400 transition-colors" onclick="clearOutput()">清空</button>
+                            </div>
+                            <div id="outputPanel" class="output-panel">
+                                <span class="out-info">点击 "运行" 按钮执行代码...</span>
+                            </div>
+                        </div>
+
+                        <!-- 进度统计 -->
+                        <div class="px-6 py-3 border-t border-white/5 bg-dark-800/30 flex items-center justify-between">
+                            <span class="text-gray-500 text-xs font-mono">
+                                <i class="fa fa-trophy mr-1 text-yellow-500"></i>完成进度：<span id="completedCount" class="text-primary">0</span> / 5 题
+                            </span>
+                            <div class="flex gap-1">
+                                <span id="dot0" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                                <span id="dot1" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                                <span id="dot2" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                                <span id="dot3" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                                <span id="dot4" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                                <span id="dot5" class="w-2 h-2 rounded-full bg-gray-700"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========== 页脚 ========== -->
+        <footer class="footer-gradient text-white py-10">
+            <div class="container mx-auto px-4 text-center">
+                <div class="mb-4">
+                    <a href="index.html" class="text-lg font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent hover:opacity-80 transition-opacity">
+                        <i class="fa fa-diamond mr-1"></i> 个人主页
+                    </a>
+                </div>
+                <p class="text-gray-500 text-sm">&copy; 2026 个人主页 | 简约科技风格</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 回到顶部按钮 -->
+    <button id="backToTop" class="back-to-top" aria-label="回到顶部">
+        <i class="fa fa-chevron-up"></i>
+    </button>
+
+    <script>
+        // ========== 移动端菜单 ==========
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        let menuOpen = false;
+
+        menuBtn.addEventListener('click', () => {
+            menuOpen = !menuOpen;
+            mobileMenu.classList.toggle('open');
+            menuIcon.className = menuOpen ? 'fa fa-times' : 'fa fa-bars';
+        });
+
+        document.querySelectorAll('.mobile-link').forEach(link => {
+            link.addEventListener('click', () => {
+                menuOpen = false;
+                mobileMenu.classList.remove('open');
+                menuIcon.className = 'fa fa-bars';
+            });
+        });
+
+        // ========== 导航栏滚动效果 ==========
+        const navbar = document.getElementById('navbar');
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.style.borderBottomColor = 'rgba(0, 212, 255, 0.1)';
+            } else {
+                navbar.style.borderBottomColor = 'rgba(255, 255, 255, 0.05)';
+            }
+            if (window.scrollY > 400) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // ========== 平滑滚动 ==========
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const offsetTop = target.offsetTop - 80;
+                    window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                }
+            });
+        });
+
+        // ========== 滚动入场动画 ==========
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('revealed');
+
+                    const progressBars = entry.target.querySelectorAll('.progress-fill');
+                    progressBars.forEach(bar => {
+                        const width = bar.getAttribute('data-width');
+                        setTimeout(() => { bar.style.width = width; }, 300);
+                    });
+
+                    if (entry.target.querySelector('.progress-fill')) {
+                        const bar = entry.target.querySelector('.progress-fill');
+                        const width = bar.getAttribute('data-width');
+                        setTimeout(() => { bar.style.width = width; }, 300);
+                    }
+
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.scroll-reveal').forEach(el => {
+            observer.observe(el);
+        });
+
+        // ========== 复制代码功能 ==========
+        function copyCode(btn) {
+            const codeBody = btn.closest('.code-block').querySelector('.code-body');
+            const text = codeBody.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '已复制 ✓';
+                btn.style.color = '#10b981';
+                btn.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                setTimeout(() => { btn.textContent = original; btn.style.color = ''; btn.style.borderColor = ''; }, 1500);
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const original = btn.textContent;
+                btn.textContent = '已复制 ✓';
+                btn.style.color = '#10b981';
+                btn.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                setTimeout(() => { btn.textContent = original; btn.style.color = ''; btn.style.borderColor = ''; }, 1500);
+            });
+        }
+
+        // ========== 在线练习系统 ==========
+        const exercises = [
+            {
+                title: '自由练习',
+                detail: '在这里自由编写 Python 代码，点击运行查看输出结果。可以尝试各种 Python 语法！',
+                hint: '',
+                code: '# 欢迎来到 Python 在线练习！\n# 在这里自由编写代码，点击"运行"查看结果\n\nname = "王佳仪"\nage = 20\nprint(f"你好，我是{name}，今年{age}岁")\n\n# 试试列表操作\nscores = [90, 85, 92, 78, 88]\nprint(f"成绩列表: {scores}")\nprint(f"平均分: {sum(scores)/len(scores):.1f}")',
+                validate: null
+            },
+            {
+                title: '第1题：变量与打印',
+                detail: '创建两个变量：name 赋值为你的名字（字符串），age 赋值为你的年龄（整数），然后用 print() 输出它们。要求输出格式为："我叫xxx，今年xx岁"。',
+                hint: '使用 f-string 格式化字符串：f"我叫{name}，今年{age}岁"',
+                code: '# 创建变量并打印\nname = \nage = \nprint(f"我叫{name}，今年{age}岁")',
+                validate: (output) => output.includes('我叫') && output.includes('今年') && output.includes('岁')
+            },
+            {
+                title: '第2题：列表操作',
+                detail: '创建一个包含数字 [3, 1, 4, 1, 5, 9, 2, 6] 的列表 nums，然后：1) 对列表排序；2) 输出排序后的列表；3) 输出列表的长度和最大值。',
+                hint: '使用 sorted() 或 .sort() 排序，len() 求长度，max() 求最大值',
+                code: '# 列表操作练习\nnums = [3, 1, 4, 1, 5, 9, 2, 6]\n\n# 1. 排序\n# 2. 输出排序后的列表\n# 3. 输出长度和最大值',
+                validate: (output) => output.includes('1') && output.includes('9') && (output.includes('8') || output.includes('len'))
+            },
+            {
+                title: '第3题：条件判断',
+                detail: '编写一个程序，定义变量 score = 85。根据分数输出等级：>=90 输出"优秀"，>=80 输出"良好"，>=70 输出"中等"，>=60 输出"及格"，<60 输出"不及格"。',
+                hint: '使用 if / elif / else 语句，注意从大到小判断',
+                code: '# 条件判断练习\nscore = 85\n\n# 请根据分数输出对应等级',
+                validate: (output) => output.includes('良好')
+            },
+            {
+                title: '第4题：函数定义',
+                detail: '定义一个函数 is_even(n)，接收一个整数参数，判断它是否为偶数。如果是偶数返回 True，否则返回 False。然后测试：输出 is_even(4) 和 is_even(7) 的结果。',
+                hint: '使用取余运算符 % 判断：n % 2 == 0 则为偶数',
+                code: '# 函数定义练习\n\n# 定义 is_even 函数\n\n# 测试\nprint(is_even(4))  # 应输出 True\nprint(is_even(7))  # 应输出 False',
+                validate: (output) => output.includes('True') && output.includes('False')
+            },
+            {
+                title: '第5题：字典与循环',
+                detail: '创建一个字典 students = {"王佳仪": 90, "张三": 85, "李四": 92}，使用 for 循环遍历字典，输出每个学生的姓名和分数，最后输出最高分的学生姓名。',
+                hint: '使用 for key, value in dict.items() 遍历，用 max(dict, key=dict.get) 找最高分',
+                code: '# 字典与循环练习\nstudents = {"王佳仪": 90, "张三": 85, "李四": 92}\n\n# 遍历输出每个学生\n\n# 输出最高分学生',
+                validate: (output) => output.includes('李四') && output.includes('92')
+            }
+        ];
+
+        let currentExercise = 0;
+        let completedExercises = new Set();
+
+        function switchExercise(index) {
+            // 保存当前代码
+            exercises[currentExercise].code = document.getElementById('codeEditor').value;
+            currentExercise = index;
+
+            // 更新标签状态
+            document.querySelectorAll('.exercise-tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+
+            // 更新题目信息
+            const ex = exercises[index];
+            document.getElementById('exerciseTitle').textContent = ex.title;
+            document.getElementById('exerciseDetail').textContent = ex.detail;
+
+            // 提示
+            const hintEl = document.getElementById('exerciseHint');
+            if (ex.hint) {
+                document.getElementById('hintText').textContent = ex.hint;
+                hintEl.classList.remove('hidden');
+            } else {
+                hintEl.classList.add('hidden');
+            }
+
+            // 结果徽章
+            const resultEl = document.getElementById('exerciseResult');
+            resultEl.classList.add('hidden');
+            resultEl.innerHTML = '';
+
+            // 加载代码
+            document.getElementById('codeEditor').value = ex.code;
+
+            // 清空输出
+            document.getElementById('outputPanel').innerHTML = '<span class="out-info">点击 "运行" 按钮执行代码...</span>';
+        }
+
+        function resetCode() {
+            document.getElementById('codeEditor').value = exercises[currentExercise].code;
+            document.getElementById('outputPanel').innerHTML = '<span class="out-info">代码已重置，点击 "运行" 执行...</span>';
+            const resultEl = document.getElementById('exerciseResult');
+            resultEl.classList.add('hidden');
+        }
+
+        function clearOutput() {
+            document.getElementById('outputPanel').innerHTML = '';
+        }
+
+        // Tab 键支持
+        document.getElementById('codeEditor').addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                e.preventDefault();
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.substring(0, start) + '    ' + this.value.substring(end);
+                this.selectionStart = this.selectionEnd = start + 4;
+            }
+            // Ctrl+Enter 运行
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runCode();
+            }
+        });
+
+        // ========== Python 模拟执行器 ==========
+        function runCode() {
+            const code = document.getElementById('codeEditor').value;
+            const output = document.getElementById('outputPanel');
+            output.innerHTML = '';
+
+            try {
+                const result = simulatePython(code);
+                result.forEach(line => {
+                    const div = document.createElement('div');
+                    div.className = line.type === 'error' ? 'out-error' : '';
+                    div.textContent = line.text;
+                    output.appendChild(div);
+                });
+
+                // 验证题目
+                const ex = exercises[currentExercise];
+                if (ex.validate) {
+                    const outputText = result.map(l => l.text).join('\n');
+                    const passed = ex.validate(outputText);
+                    const resultEl = document.getElementById('exerciseResult');
+                    resultEl.classList.remove('hidden');
+
+                    if (passed) {
+                        resultEl.innerHTML = '<span class="result-badge result-pass"><i class="fa fa-check-circle"></i>通过</span>';
+                        if (!completedExercises.has(currentExercise)) {
+                            completedExercises.add(currentExercise);
+                            updateProgress();
+                        }
+                    } else {
+                        resultEl.innerHTML = '<span class="result-badge result-fail"><i class="fa fa-times-circle"></i>未通过</span>';
+                    }
+                }
+            } catch (err) {
+                output.innerHTML = `<div class="out-error">❌ 错误: ${err.message}</div>`;
+            }
+        }
+
+        function simulatePython(code) {
+            const output = [];
+            const lines = code.split('\n');
+            let vars = {};
+            let functions = {};
+
+            // 简化 Python 解释器
+            function evalExpr(expr, localVars) {
+                expr = expr.trim();
+                const v = localVars || vars;
+
+                // f-string
+                if (expr.startsWith('f"') || expr.startsWith("f'")) {
+                    const quote = expr[1];
+                    let content = expr.slice(2, -1);
+                    content = content.replace(/\{([^}]+)\}/g, (_, e) => {
+                        try { return evalExpr(e, v); }
+                        catch { return `{${e}}`; }
+                    });
+                    return content;
+                }
+
+                // 字符串
+                if ((expr.startsWith('"') && expr.endsWith('"')) || (expr.startsWith("'") && expr.endsWith("'"))) {
+                    return expr.slice(1, -1);
+                }
+
+                // 布尔
+                if (expr === 'True') return 'True';
+                if (expr === 'False') return 'False';
+
+                // 数字
+                if (/^-?\d+(\.\d+)?$/.test(expr)) return parseFloat(expr);
+
+                // 列表
+                if (expr.startsWith('[') && expr.endsWith(']')) {
+                    const inner = expr.slice(1, -1).trim();
+                    if (inner === '') return '[]';
+                    const items = smartSplit(inner, ',');
+                    const result = items.map(item => evalExpr(item.trim(), v));
+                    return '[' + result.join(', ') + ']';
+                }
+
+                // 字典
+                if (expr.startsWith('{') && expr.endsWith('}') && expr.includes(':')) {
+                    const inner = expr.slice(1, -1).trim();
+                    if (inner === '') return '{}';
+                    const pairs = smartSplit(inner, ',');
+                    const result = pairs.map(p => {
+                        const [k, val] = p.split(':').map(s => s.trim());
+                        return evalExpr(k, v) + ': ' + evalExpr(val, v);
+                    });
+                    return '{' + result.join(', ') + '}';
+                }
+
+                // len()
+                if (/^len\(/.test(expr)) {
+                    const arg = expr.match(/^len\((.+)\)$/);
+                    if (arg) {
+                        const val = evalExpr(arg[1], v);
+                        if (typeof val === 'string' && val.startsWith('[')) {
+                            const items = val.slice(1, -1).split(',').filter(s => s.trim());
+                            return items.length === 1 && items[0] === '' ? 0 : items.length;
+                        }
+                        return String(val).length;
+                    }
+                }
+
+                // sum()
+                if (/^sum\(/.test(expr)) {
+                    const arg = expr.match(/^sum\((.+)\)$/);
+                    if (arg) {
+                        const val = evalExpr(arg[1], v);
+                        if (typeof val === 'string' && val.startsWith('[')) {
+                            const items = val.slice(1, -1).split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+                            return items.reduce((a, b) => a + b, 0);
+                        }
+                    }
+                }
+
+                // max()
+                if (/^max\(/.test(expr)) {
+                    const arg = expr.match(/^max\((.+)\)$/);
+                    if (arg) {
+                        const val = evalExpr(arg[1], v);
+                        if (typeof val === 'string' && val.startsWith('[')) {
+                            const items = val.slice(1, -1).split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+                            return Math.max(...items);
+                        }
+                    }
+                }
+
+                // sorted()
+                if (/^sorted\(/.test(expr)) {
+                    const arg = expr.match(/^sorted\((.+)\)$/);
+                    if (arg) {
+                        const val = evalExpr(arg[1], v);
+                        if (typeof val === 'string' && val.startsWith('[')) {
+                            const items = val.slice(1, -1).split(',').map(s => {
+                                const t = s.trim();
+                                const n = parseFloat(t);
+                                return isNaN(n) ? t : n;
+                            });
+                            items.sort((a, b) => a - b);
+                            return '[' + items.join(', ') + ']';
+                        }
+                    }
+                }
+
+                // type()
+                if (/^type\(/.test(expr)) {
+                    const arg = expr.match(/^type\((.+)\)$/);
+                    if (arg) {
+                        const val = evalExpr(arg[1], v);
+                        if (typeof val === 'number') return "<class 'int'>";
+                        if (typeof val === 'string') {
+                            if (val.startsWith('[')) return "<class 'list'>";
+                            if (val.startsWith('{')) return "<class 'dict'>";
+                            return "<class 'str'>";
+                        }
+                        return "<class 'str'>";
+                    }
+                }
+
+                // range()
+                if (/^range\(/.test(expr)) {
+                    const arg = expr.match(/^range\((.+)\)$/);
+                    if (arg) {
+                        const params = arg[1].split(',').map(s => parseInt(s.trim()));
+                        let start = 0, end, step = 1;
+                        if (params.length === 1) { end = params[0]; }
+                        else if (params.length === 2) { start = params[0]; end = params[1]; }
+                        else { start = params[0]; end = params[1]; step = params[2]; }
+                        const items = [];
+                        if (step > 0) { for (let i = start; i < end; i += step) items.push(i); }
+                        else { for (let i = start; i > end; i += step) items.push(i); }
+                        return '[' + items.join(', ') + ']';
+                    }
+                }
+
+                // .append(), .sort(), .items(), .get()
+                if (expr.includes('.append(')) {
+                    const m = expr.match(/^(.+)\.append\((.+)\)$/);
+                    if (m) {
+                        const listVal = evalExpr(m[1], v);
+                        const itemVal = evalExpr(m[2], v);
+                        let items = [];
+                        if (typeof listVal === 'string' && listVal.startsWith('[')) {
+                            items = listVal.slice(1, -1).split(',').filter(s => s.trim());
+                        }
+                        items.push(String(itemVal));
+                        const newList = '[' + items.join(', ') + ']';
+                        // Try to assign back
+                        const varName = m[1].trim();
+                        if (varName in v) { v[varName] = newList; }
+                        return newList;
+                    }
+                }
+
+                // .format()
+                if (expr.includes('.format(')) {
+                    const m = expr.match(/^(.+)\.format\((.+)\)$/);
+                    if (m) {
+                        let template = evalExpr(m[1], v);
+                        const args = smartSplit(m[2], ',').map(a => evalExpr(a.trim(), v));
+                        args.forEach((arg, i) => {
+                            template = template.replace('{}', arg);
+                        });
+                        return template;
+                    }
+                }
+
+                // 算术运算
+                if (/^[\w.]+(\s*[\+\-\*\/\%\*]\s*[\w.]+)+$/.test(expr) || /^[\w.]+\s*[\+\-\*\/\%\*]\s*[\w.]+$/.test(expr)) {
+                    try {
+                        // Handle ** (power)
+                        let evalStr = expr.replace(/\*\*/g, '^');
+                        // Replace variable names with their values
+                        evalStr = evalStr.replace(/([a-zA-Z_]\w*)/g, (name) => {
+                            if (name in v) return v[name];
+                            if (name === 'True') return 'true';
+                            if (name === 'False') return 'false';
+                            return name;
+                        });
+                        const result = Function('"use strict"; return (' + evalStr + ')')();
+                        if (typeof result === 'number') {
+                            return Number.isInteger(result) ? result : parseFloat(result.toFixed(4));
+                        }
+                        return String(result);
+                    } catch {}
+                }
+
+                // 比较运算
+                if (/[><=!]=?/.test(expr)) {
+                    try {
+                        let evalStr = expr.replace(/([a-zA-Z_]\w*)/g, (name) => {
+                            if (name in v) return v[name];
+                            return name;
+                        });
+                        const result = Function('"use strict"; return (' + evalStr + ')')();
+                        return result ? 'True' : 'False';
+                    } catch {}
+                }
+
+                // 变量查找
+                if (v && expr in v) return v[expr];
+
+                return expr;
+            }
+
+            function smartSplit(str, delimiter) {
+                const result = [];
+                let depth = 0;
+                let current = '';
+                let inStr = false;
+                let strChar = '';
+                for (let i = 0; i < str.length; i++) {
+                    const ch = str[i];
+                    if (inStr) {
+                        current += ch;
+                        if (ch === strChar) inStr = false;
+                    } else if (ch === '"' || ch === "'") {
+                        inStr = true;
+                        strChar = ch;
+                        current += ch;
+                    } else if (ch === '[' || ch === '{' || ch === '(') {
+                        depth++;
+                        current += ch;
+                    } else if (ch === ']' || ch === '}' || ch === ')') {
+                        depth--;
+                        current += ch;
+                    } else if (ch === delimiter && depth === 0) {
+                        result.push(current);
+                        current = '';
+                    } else {
+                        current += ch;
+                    }
+                }
+                result.push(current);
+                return result;
+            }
+
+            // Parse and execute
+            let i = 0;
+            let currentIndent = 0;
+            let blockStack = [];
+            let blockConditions = [];
+
+            while (i < lines.length) {
+                let line = lines[i];
+                let trimmed = line.trimEnd();
+
+                // Skip empty lines and comments
+                if (trimmed === '' || trimmed.startsWith('#')) {
+                    i++;
+                    continue;
+                }
+
+                // Remove inline comments
+                let codeLine = trimmed;
+                const commentIdx = findCommentIndex(codeLine);
+                if (commentIdx >= 0) codeLine = codeLine.substring(0, commentIdx).trim();
+
+                if (codeLine === '') { i++; continue; }
+
+                const indent = line.search(/\S/);
+
+                // Handle blocks
+                if (codeLine.endsWith(':')) {
+                    const keyword = codeLine.split(/\s+/)[0];
+                    const condition = codeLine.substring(codeLine.indexOf(keyword) + keyword.length).replace(/:$/, '').trim();
+
+                    if (keyword === 'def') {
+                        const funcMatch = condition.match(/^(\w+)\((.*)\)$/);
+                        if (funcMatch) {
+                            const funcName = funcMatch[1];
+                            const params = funcMatch[2].split(',').map(p => p.trim()).filter(p => p);
+                            // Collect function body
+                            const bodyStart = i + 1;
+                            const bodyIndent = indent + 4;
+                            let bodyLines = [];
+                            let j = bodyStart;
+                            while (j < lines.length) {
+                                const bLine = lines[j];
+                                const bTrimmed = bLine.trim();
+                                if (bTrimmed === '' || bTrimmed.startsWith('#')) { j++; bodyLines.push(bTrimmed); continue; }
+                                const bIndent = bLine.search(/\S/);
+                                if (bIndent >= bodyIndent) {
+                                    bodyLines.push(bLine.substring(bodyIndent));
+                                    j++;
+                                } else break;
+                            }
+                            functions[funcName] = { params, body: bodyLines };
+                            i = j;
+                            continue;
+                        }
+                    }
+
+                    if (['if', 'elif', 'else', 'for', 'while'].includes(keyword)) {
+                        blockStack.push({ type: keyword, condition, indent, lineIndex: i });
+                        i++;
+                        continue;
+                    }
+                }
+
+                // Check if we're inside a block
+                if (blockStack.length > 0 && indent > blockStack[blockStack.length - 1].indent) {
+                    const block = blockStack[blockStack.length - 1];
+
+                    if (block.type === 'if') {
+                        const condResult = evalCondition(block.condition);
+                        if (condResult) {
+                            executeLine(codeLine);
+                        }
+                        // Skip to end of if/elif/else block
+                        let j = i + 1;
+                        while (j < lines.length) {
+                            const nextLine = lines[j];
+                            const nextTrimmed = nextLine.trim();
+                            if (nextTrimmed === '' || nextTrimmed.startsWith('#')) { j++; continue; }
+                            const nextIndent = nextLine.search(/\S/);
+                            if (nextIndent <= block.indent) break;
+                            j++;
+                        }
+                        // Check for elif/else
+                        if (j < lines.length) {
+                            const nextTrimmed = lines[j].trim();
+                            if (nextTrimmed.startsWith('elif') || nextTrimmed.startsWith('else')) {
+                                // Skip the entire if/elif/else chain since we already executed
+                                blockStack.pop();
+                                while (j < lines.length) {
+                                    const nt = lines[j].trim();
+                                    if (nt === '' || nt.startsWith('#')) { j++; continue; }
+                                    const ni = lines[j].search(/\S/);
+                                    if (ni <= indent && (nt.startsWith('elif') || nt.startsWith('else'))) {
+                                        // Skip this block too
+                                        let k = j + 1;
+                                        while (k < lines.length) {
+                                            const kl = lines[k];
+                                            const kt = kl.trim();
+                                            if (kt === '' || kt.startsWith('#')) { k++; continue; }
+                                            const ki = kl.search(/\S/);
+                                            if (ki <= indent) break;
+                                            k++;
+                                        }
+                                        j = k;
+                                    } else break;
+                                }
+                                i = j;
+                                continue;
+                            }
+                        }
+                        blockStack.pop();
+                        i = j;
+                        continue;
+                    }
+
+                    // For other blocks, just execute
+                    executeLine(codeLine);
+                    i++;
+                    continue;
+                }
+
+                // Pop completed blocks
+                while (blockStack.length > 0 && indent <= blockStack[blockStack.length - 1].indent) {
+                    blockStack.pop();
+                }
+
+                executeLine(codeLine);
+                i++;
+            }
+
+            function findCommentIndex(str) {
+                let inStr = false, strChar = '';
+                for (let i = 0; i < str.length; i++) {
+                    if (inStr) { if (str[i] === strChar) inStr = false; }
+                    else if (str[i] === '"' || str[i] === "'") { inStr = true; strChar = str[i]; }
+                    else if (str[i] === '#' && str[i-1] !== 'f') return i;
+                }
+                return -1;
+            }
+
+            function evalCondition(cond) {
+                // Handle simple comparisons
+                cond = cond.trim();
+                // Replace variable values
+                let evalStr = cond;
+                evalStr = evalStr.replace(/([a-zA-Z_]\w*)/g, (name) => {
+                    if (name in vars) return vars[name];
+                    if (name === 'True' || name === 'true') return 'true';
+                    if (name === 'False' || name === 'false') return 'false';
+                    return name;
+                });
+                try {
+                    return Function('"use strict"; return (' + evalStr + ')')();
+                } catch { return false; }
+            }
+
+            function executeLine(line) {
+                line = line.trim();
+                if (!line || line.startsWith('#')) return;
+
+                // print()
+                if (line.startsWith('print(')) {
+                    const inner = line.slice(6, -1);
+                    const args = smartSplit(inner, ',');
+                    const values = args.map(a => {
+                        const val = evalExpr(a.trim());
+                        return typeof val === 'number' ? val : String(val);
+                    });
+                    output.push({ text: values.join(' '), type: 'normal' });
+                    return;
+                }
+
+                // Variable assignment
+                if (line.includes('=') && !line.includes('==') && !line.includes('>=') && !line.includes('<=') && !line.includes('!=')) {
+                    const eqIdx = line.indexOf('=');
+                    // Make sure it's not ==, >=, <=, !=
+                    if (line[eqIdx - 1] !== '!' && line[eqIdx - 1] !== '>' && line[eqIdx - 1] !== '<' && line[eqIdx + 1] !== '=') {
+                        const varName = line.substring(0, eqIdx).trim();
+                        const value = line.substring(eqIdx + 1).trim();
+                        vars[varName] = evalExpr(value);
+                        return;
+                    }
+                }
+
+                // Function call
+                if (/^\w+\(/.test(line)) {
+                    const match = line.match(/^(\w+)\((.*)\)$/);
+                    if (match) {
+                        const funcName = match[1];
+                        const argsStr = match[2];
+                        if (funcName in functions) {
+                            const func = functions[funcName];
+                            const args = argsStr ? smartSplit(argsStr, ',').map(a => evalExpr(a.trim())) : [];
+                            const localVars = { ...vars };
+                            func.params.forEach((p, idx) => { localVars[p] = args[idx] !== undefined ? args[idx] : ''; });
+
+                            // Execute function body
+                            let returnValue = 'None';
+                            for (const bodyLine of func.body) {
+                                const bl = bodyLine.trim();
+                                if (!bl || bl.startsWith('#')) continue;
+
+                                if (bl.startsWith('return')) {
+                                    const retExpr = bl.substring(6).trim();
+                                    if (retExpr) returnValue = evalExpr(retExpr, localVars);
+                                    break;
+                                }
+
+                                if (bl.startsWith('print(')) {
+                                    const inner = bl.slice(6, -1);
+                                    const printArgs = smartSplit(inner, ',');
+                                    const values = printArgs.map(a => {
+                                        const val = evalExpr(a.trim(), localVars);
+                                        return typeof val === 'number' ? val : String(val);
+                                    });
+                                    output.push({ text: values.join(' '), type: 'normal' });
+                                    continue;
+                                }
+
+                                // Assignment in function
+                                if (bl.includes('=') && !bl.includes('==')) {
+                                    const eqIdx = bl.indexOf('=');
+                                    if (bl[eqIdx - 1] !== '!' && bl[eqIdx - 1] !== '>' && bl[eqIdx - 1] !== '<' && bl[eqIdx + 1] !== '=') {
+                                        const vn = bl.substring(0, eqIdx).trim();
+                                        const val = bl.substring(eqIdx + 1).trim();
+                                        localVars[vn] = evalExpr(val, localVars);
+                                    }
+                                }
+                            }
+                            return returnValue;
+                        }
+                    }
+                }
+            }
+
+            if (output.length === 0) {
+                output.push({ text: '(无输出)', type: 'info' });
+            }
+
+            return output;
+        }
+
+        function updateProgress() {
+            const count = completedExercises.size;
+            document.getElementById('completedCount').textContent = count;
+            for (let i = 1; i <= 5; i++) {
+                const dot = document.getElementById('dot' + i);
+                const tab = document.querySelector(`[data-exercise="${i}"]`);
+                if (completedExercises.has(i)) {
+                    dot.className = 'w-2 h-2 rounded-full bg-green-500';
+                    dot.style.boxShadow = '0 0 6px rgba(16, 185, 129, 0.6)';
+                    if (tab) tab.classList.add('completed');
+                }
+            }
+        }
+    </script>
+</body>
+</html>
